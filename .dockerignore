@@ -1,0 +1,9 @@
+.git
+.gitignore
+.idea
+build
+doctor_oop
+*.o
+*.out
+*.exe
+README.md

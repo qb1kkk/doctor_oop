@@ -36,6 +36,10 @@
 *.exe
 *.out
 *.app
+doctor_oop
 
 # debug information files
 *.dwo
+
+# Local build folders
+build/

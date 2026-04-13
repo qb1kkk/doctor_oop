@@ -1,0 +1,23 @@
+FROM gcc:14-bookworm AS builder
+
+WORKDIR /app
+COPY src ./src
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN g++ -std=c++17 -O2 -pipe -static-libstdc++ -static-libgcc ./src/*.cpp -lpq -o ./doctor_oop
+
+FROM debian:bookworm-slim
+
+WORKDIR /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/doctor_oop ./doctor_oop
+
+EXPOSE 8080
+
+CMD ["./doctor_oop", "--server-only", "--port=8080"]

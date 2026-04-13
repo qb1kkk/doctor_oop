@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberMed Registry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="scan-lines"></div>
+<div class="pixel-stars"></div>
+
+<main class="panel" id="mainPanel">
+    <div class="hangar-doors" aria-hidden="true">
+        <div class="door door--left"></div>
+        <div class="door door--right"></div>
+        <div class="door-center-line"></div>
+    </div>
+
+    <header class="panel__header">
+        <div class="top-controls">
+            <div class="lang-switch">
+                <button type="button" class="lang-btn is-active" id="langRu">RU</button>
+                <button type="button" class="lang-btn" id="langEn">EN</button>
+            </div>
+            <button type="button" id="logoutBtn" class="logout-btn hidden" data-i18n="logout">Выйти</button>
+        </div>
+        <p class="eyebrow">Medical Neural Console v10.2</p>
+        <h1 data-i18n="title">Реестр болезней пациента</h1>
+        <p class="subtitle" data-i18n="subtitle">Регистрация и кабинеты врача/пациента с клиническими данными</p>
+    </header>
+
+    <section id="authSection" class="auth-section">
+        <div class="mode-switch">
+            <button type="button" id="loginModeBtn" class="tab-btn is-active" data-i18n="loginTab">Вход</button>
+            <button type="button" id="registerModeBtn" class="tab-btn" data-i18n="registerTab">Регистрация</button>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+            <label data-i18n="roleLabel">Роль</label>
+            <select id="loginRole" name="role">
+                <option value="doctor" data-i18n="roleDoctor">Врач</option>
+                <option value="patient" data-i18n="rolePatient">Пациент</option>
+            </select>
+
+            <label data-i18n="emailLabel">Email</label>
+            <input type="email" id="loginEmail" name="email" autocomplete="email" required>
+
+            <label data-i18n="passwordLabel">Пароль</label>
+            <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+
+            <button type="submit" data-i18n="loginBtn">Войти</button>
+        </form>
+
+        <div id="registerBlock" class="hidden">
+            <div class="mode-switch mode-switch--small">
+                <button type="button" id="registerDoctorTab" class="tab-btn is-active" data-i18n="roleDoctor">Врач</button>
+                <button type="button" id="registerPatientTab" class="tab-btn" data-i18n="rolePatient">Пациент</button>
+            </div>
+
+            <form id="registerDoctorForm" class="auth-form">
+                <label data-i18n="doctorNameLabel">ФИО врача</label>
+                <input type="text" id="doctorName" name="fullName" required>
+
+                <label data-i18n="emailLabel">Email</label>
+                <input type="email" id="doctorEmail" name="email" required>
+
+                <label data-i18n="passwordLabel">Пароль</label>
+                <input type="password" id="doctorPassword" name="password" required>
+
+                <button type="submit" data-i18n="registerDoctorBtn">Зарегистрировать врача</button>
+            </form>
+
+            <form id="registerPatientForm" class="auth-form hidden">
+                <label data-i18n="patientFirstNameLabel">Имя пациента</label>
+                <input type="text" id="patientFirstName" name="firstName" required>
+
+                <label data-i18n="patientLastNameLabel">Фамилия пациента</label>
+                <input type="text" id="patientLastName" name="lastName" required>
+
+                <label data-i18n="doctorSelectLabel">Лечащий врач</label>
+                <select id="patientDoctorId" name="doctorId" required></select>
+
+                <label data-i18n="emailLabel">Email</label>
+                <input type="email" id="patientEmail" name="email" required>
+
+                <label data-i18n="passwordLabel">Пароль</label>
+                <input type="password" id="patientPassword" name="password" required>
+
+                <button type="submit" data-i18n="registerPatientBtn">Зарегистрировать пациента</button>
+            </form>
+        </div>
+
+        <p id="authMessage" class="status"></p>
+        <p class="hint" data-i18n="demoHint">
+            Демо-аккаунты: doctor@clinic.local / doctor123, ivanov@clinic.local / patient123
+        </p>
+    </section>
+
+    <section id="dashboardSection" class="hidden">
+        <p id="welcomeText" class="status status--ok"></p>
+
+        <section id="doctorDashboard" class="hidden">
+            <h2 data-i18n="doctorCabinetTitle">Кабинет врача</h2>
+            <p class="status" data-i18n="doctorCabinetHint">Список ваших пациентов и их болезней:</p>
+            <div class="doctor-controls">
+                <button type="button" id="refreshDoctorBtn" class="tab-btn" data-i18n="refreshBtn">Обновить</button>
+                <label class="toggle-line">
+                    <input type="checkbox" id="chronicOnlyToggle">
+                    <span class="toggle-ui"></span>
+                    <span class="toggle-text" data-i18n="chronicOnlyToggle">Только хронические</span>
+                </label>
+            </div>
+            <div id="doctorPatients" class="doctor-patients"></div>
+        </section>
+
+        <section id="patientDashboard" class="hidden">
+            <h2 data-i18n="patientCabinetTitle">Кабинет пациента</h2>
+            <section id="result" class="result result--idle">
+                <p data-i18n="waitingData">Ожидание данных...</p>
+            </section>
+        </section>
+    </section>
+
+    <div id="panelBackdrop" class="panel-backdrop hidden"></div>
+
+    <section id="addDiseasePanel" class="neo-panel hidden">
+        <div class="neo-panel__head">
+            <h3 data-i18n="addDiseasePanelTitle">Назначить болезнь</h3>
+            <button type="button" id="closeAddPanel" class="icon-btn">X</button>
+        </div>
+        <form id="addDiseaseForm" class="neo-form">
+            <input type="hidden" id="addPatientId" name="patientId">
+            <p id="addPatientLabel" class="status"></p>
+
+            <div class="switcher">
+                <button type="button" id="modeExistingBtn" class="tab-btn is-active" data-i18n="existingMode">Из библиотеки</button>
+                <button type="button" id="modeCustomBtn" class="tab-btn" data-i18n="customMode">Новая болезнь</button>
+            </div>
+
+            <div id="existingModeBlock" class="neo-grid">
+                <label data-i18n="diseaseLibraryLabel">Библиотека болезней</label>
+                <select id="libraryDiseaseId" name="diseaseId"></select>
+            </div>
+
+            <div id="customModeBlock" class="neo-grid hidden">
+                <label data-i18n="diseaseNameLabel">Название болезни</label>
+                <input type="text" id="addDiseaseName" name="name">
+
+                <label data-i18n="icdCodeLabel">Код МКБ-10</label>
+                <input type="text" id="addDiseaseIcd" name="icdCode">
+
+                <label class="toggle-line">
+                    <input type="checkbox" id="addDiseaseChronic" name="chronic">
+                    <span class="toggle-ui"></span>
+                    <span class="toggle-text" data-i18n="chronicToggle">Хроническая болезнь</span>
+                </label>
+
+                <label data-i18n="descriptionLabel">Описание</label>
+                <textarea id="addDiseaseDescription" name="description" rows="3"></textarea>
+
+                <label data-i18n="treatmentLabel">Курс лечения (через ;)</label>
+                <textarea id="addDiseaseTreatment" name="treatment" rows="3"></textarea>
+            </div>
+
+            <button type="submit" data-i18n="assignDiseaseBtn">Назначить болезнь</button>
+            <p id="addDiseaseMessage" class="status"></p>
+        </form>
+    </section>
+
+    <section id="editDiseasePanel" class="neo-panel hidden">
+        <div class="neo-panel__head">
+            <h3 data-i18n="editDiseasePanelTitle">Редактировать болезнь</h3>
+            <button type="button" id="closeEditPanel" class="icon-btn">X</button>
+        </div>
+        <form id="editDiseaseForm" class="neo-form">
+            <input type="hidden" id="editPatientId" name="patientId">
+            <input type="hidden" id="editDiseaseId" name="diseaseId">
+            <p id="editDiseaseLabel" class="status"></p>
+
+            <label data-i18n="diseaseNameLabel">Название болезни</label>
+            <input type="text" id="editDiseaseName" name="name" required>
+
+            <label data-i18n="icdCodeLabel">Код МКБ-10</label>
+            <input type="text" id="editDiseaseIcd" name="icdCode" required>
+
+            <label class="toggle-line">
+                <input type="checkbox" id="editDiseaseChronic" name="chronic">
+                <span class="toggle-ui"></span>
+                <span class="toggle-text" data-i18n="chronicToggle">Хроническая болезнь</span>
+            </label>
+
+            <label data-i18n="descriptionLabel">Описание</label>
+            <textarea id="editDiseaseDescription" name="description" rows="3" required></textarea>
+
+            <label data-i18n="treatmentLabel">Курс лечения (через ;)</label>
+            <textarea id="editDiseaseTreatment" name="treatment" rows="3" required></textarea>
+
+            <button type="submit" data-i18n="saveDiseaseBtn">Сохранить изменения</button>
+            <p id="editDiseaseMessage" class="status"></p>
+        </form>
+    </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
